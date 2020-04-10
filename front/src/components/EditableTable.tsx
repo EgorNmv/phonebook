@@ -1,5 +1,6 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import {Table, Input, Button, Popconfirm, Form} from 'antd';
+import {Column, User} from "../utils/types";
 
 const EditableContext = React.createContext(null as any);
 
@@ -87,73 +88,67 @@ const EditableCell = (
     return <td {...restProps}>{childNode}</td>;
 };
 
-export const EditableTable: React.FC = () => {
+export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
 
-    const dataColumns = [
+    const dataColumns: Column[] = [
         {
-            title: 'name',
-            dataIndex: 'name',
+            title: 'ID',
+            dataIndex: 'id',
+            render: (text => <strong>{text}</strong>)
+        },
+        {
+            title: 'NAME',
+            dataIndex: ["firstName", "secondName"],
             width: '30%',
             editable: true,
+            render: ((text, record) => `${record.firstName} ${record.secondName}`)
         },
         {
-            title: 'age',
-            dataIndex: 'age',
+            title: 'PHONE',
+            dataIndex: 'phone',
         },
         {
-            title: 'address',
-            dataIndex: 'address',
+            title: 'CABINET',
+            dataIndex: 'cabinet',
         },
         {
-            title: 'operation',
+            title: 'POST',
+            dataIndex: 'post'
+        },
+        {
+            title: 'OPERATION',
             dataIndex: 'operation',
             render: (text: string, record: any) =>
                 dataSource.length >= 1 ? (
-                    <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
+                    <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
                         <a>Delete</a>
                     </Popconfirm>
                 ) : null,
         },
     ];
-    const [dataSource, setDataSource] = useState<{
-        key: string,
-        name: string,
-        age: string,
-        address: string
-    }[]>([
-        {
-            key: '0',
-            name: 'Edward King 0',
-            age: '32',
-            address: 'London, Park Lane no. 0',
-        },
-        {
-            key: '1',
-            name: 'Edward King 1',
-            age: '32',
-            address: 'London, Park Lane no. 1',
-        },
-    ]);
-    const [count, setCount] = useState<number>(2);
+    const [dataSource, setDataSource] = useState<User[]>(data);
+    const [count, setCount] = useState<number>(data.length);
 
-    const handleDelete = (key: any) => {
-        setDataSource(prevState => prevState.filter(item => item.key !== key));
+    const handleDelete = (id: number) => {
+        setDataSource(prevState => prevState.filter(item => item.id !== id));
     };
 
     const handleAdd = () => {
         const newData = {
-            key: `${count}`,
-            name: `Edward King ${count}`,
-            age: "32",
-            address: `London, Park Lane no. ${count}`,
+            id: dataSource.length,
+            firstName: `Name ${dataSource.length}`,
+            secondName: `Surname ${dataSource.length}`,
+            phone: "88005553535",
+            cabinet: "229",
+            internalPhone: "00-00"
         };
-        setDataSource(prevState => [...prevState, newData]);
+        setDataSource(prevState => [...prevState, newData] as User[]);
         setCount(prevState => prevState + 1);
     };
 
     const handleSave = (row: any) => {
         const newData = [...dataSource];
-        const index = newData.findIndex(item => row.key === item.key);
+        const index = newData.findIndex(item => row.key === item.id);
         const item = newData[index];
         newData.splice(index, 1, {...item, ...row});
         setDataSource(newData);
@@ -185,6 +180,14 @@ export const EditableTable: React.FC = () => {
 
     return (
         <div>
+            <div>Total contacts: {count}</div>
+            <Table
+                components={components}
+                rowClassName={() => 'editable-row'}
+                bordered
+                dataSource={dataSource}
+                columns={columns}
+            />
             <Button
                 onClick={handleAdd}
                 type="primary"
@@ -194,13 +197,6 @@ export const EditableTable: React.FC = () => {
             >
                 Add a row
             </Button>
-            <Table
-                components={components}
-                rowClassName={() => 'editable-row'}
-                bordered
-                dataSource={dataSource}
-                columns={columns}
-            />
         </div>
     );
 };

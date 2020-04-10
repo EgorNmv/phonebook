@@ -1,10 +1,10 @@
 import React from "react";
 import {graphql, createFragmentContainer} from "react-relay";
+import {User} from "../utils/types";
 
-const UserItem: React.FunctionComponent<{ user: any }> =
-    (props) => (
-        <div>
-            {props.user.firstName}
+const UserItem: React.FunctionComponent<{ user: User }> =
+    ({user}) => (<div>
+            {`${user.firstName} ${user.secondName}`}
         </div>
     );
 

@@ -2,7 +2,7 @@ import {Resolver, Query, Arg, Mutation, Args} from "type-graphql";
 import {plainToClass} from "class-transformer";
 import {UserType} from "../types/userType";
 import {usersData} from "../../data/usersData";
-import {AddUserInput, TestArgs} from "../inputs/addUserInput";
+import {AddUserInput} from "../inputs/addUserInput";
 import {UpdateUserInput} from "../inputs/updateUserInput";
 
 @Resolver((of) => UserType)

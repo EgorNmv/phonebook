@@ -1,8 +1,8 @@
-import {Field, ObjectType, Int, Float} from "type-graphql";
+import {Field, ObjectType, Int, Float, ID} from "type-graphql";
 
 @ObjectType({description: "Object representing user"})
 export class UserType {
-    @Field(() => Int)
+    @Field(() => ID)
     id: number;
 
     @Field()

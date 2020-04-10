@@ -1,12 +1,4 @@
-export type User = {
-    id: number;
-    firstName: string;
-    secondName: string;
-    phone: number;
-    cabinet: number;
-    post?: string;
-    internalPhone: number;
-};
+import {User} from "../utils/types";
 
 export const usersData: User[] = new Array(50).fill("").map((_, index) => ({
     id: index,

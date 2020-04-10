@@ -15,7 +15,7 @@ scalar DateTime
 type Mutation {
   addRecipe(recipe: RecipeInput!): Recipe!
   addUser(user: AddUserInput!): UserType!
-  updateUser(id: Int!, firstName: String, secondName: String, phone: Float, cabinet: Int, post: String, internalPhone: Int): UserType
+  updateUser(id: ID!, firstName: String, secondName: String, phone: Float, cabinet: Int, post: String, internalPhone: Int): UserType
   deleteUser(id: Float!): UserType
 }
 
@@ -52,7 +52,7 @@ input RecipeInput {
 
 """Object representing user"""
 type UserType {
-  id: Int!
+  id: ID!
   firstName: String!
   secondName: String!
   phone: Float!

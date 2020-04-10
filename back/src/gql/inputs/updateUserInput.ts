@@ -1,11 +1,11 @@
 import {UserType} from "../types/userType";
-import {Field, Int, Float, ArgsType} from "type-graphql";
+import {Field, Int, Float, ArgsType, ID} from "type-graphql";
 import {Min, Max, MinLength, MaxLength} from "class-validator";
 
 @ArgsType()
 export class UpdateUserInput implements Partial<UserType> {
 
-    @Field(() => Int)
+    @Field(() => ID)
     id: number;
 
     @Field({nullable: true})

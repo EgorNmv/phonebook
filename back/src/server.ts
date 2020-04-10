@@ -2,6 +2,7 @@ import "reflect-metadata";
 import express from "express";
 import dotenv from "dotenv";
 import * as path from "path";
+import cors from "cors";
 import graphqlHTTP from "express-graphql";
 import {buildSchemaSync} from "type-graphql";
 import {RecipeResolver} from "./gql/resolvers/recipeResolver";
@@ -16,6 +17,8 @@ const schema: GraphQLSchema = buildSchemaSync({
     resolvers: [RecipeResolver, UserResolver],
     emitSchemaFile: path.resolve(__dirname, "../src/gql", "schema.gql"),
 });
+
+app.use(cors());
 
 app.get("/", (req: express.Request, res: express.Response): void => {
     res.send("Sorry, i'm in dev yet");

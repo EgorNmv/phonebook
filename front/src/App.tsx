@@ -1,16 +1,29 @@
 import React from "react";
-import {EditableTable} from "./components/EditableTable";
-import {TestComponent} from "./components/TestComponent";
-import UserList from "./components/UserList";
-import UserListPage from "./components/UserListPage";
+import EditableTableData from "./hoc/EditableTableData";
+import {PageHeader, Layout} from "antd";
+
+const {Header, Content, Footer} = Layout;
+
+// import UserListPage from "./components/UserListPage";
+// import {EditableTable} from "./components/EditableTable";
+// import TestComponent from "./components/TestComponent";
 
 function App() {
-    return <div>
-        <UserListPage/>
-        <TestComponent/>
-        <UserList/>
-        <EditableTable/>
-    </div>;
+    return <Layout className="layout">
+        <Header style={{background: "white"}}>
+            <PageHeader
+                className="site-page-header"
+                title="PHONEBOOK"
+                subTitle="Manage your contacts easy"
+            />
+        </Header>
+        <Content style={{padding: '0 50px'}}>
+            {/*<UserListPage/>*/}
+            <EditableTableData/>
+            {/*<TestComponent/>*/}
+        </Content>
+        <Footer style={{textAlign: 'center'}}>Phone book ©2020</Footer>
+    </Layout>;
 }
 
 export default App;

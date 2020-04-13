@@ -1,6 +1,10 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
-import {Table, Input, Button, Popconfirm, Form} from 'antd';
+import {Table, Input, Button, Popconfirm, Form, Modal} from 'antd';
 import {Column, User} from "../utils/types";
+import AddUserMutation from "../mutations/AddUserMutation";
+import DeleteUserMutation from "../mutations/DeleteUserMutation";
+import UpdateUserMutation from "../mutations/UpdateUserMutation";
+import {AddingUserModal} from "./AddingUserModal";
 
 const EditableContext = React.createContext(null as any);
 
@@ -97,23 +101,31 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
             render: (text => <strong>{text}</strong>)
         },
         {
-            title: 'NAME',
-            dataIndex: ["firstName", "secondName"],
+            title: 'FIRSTNAME',
+            dataIndex: "firstName",
+            width: '30%',
+            editable: true
+        },
+        {
+            title: 'SECONDNAME',
+            dataIndex: "secondName",
             width: '30%',
             editable: true,
-            render: ((text, record) => `${record.firstName} ${record.secondName}`)
         },
         {
             title: 'PHONE',
             dataIndex: 'phone',
+            editable: true
         },
         {
             title: 'CABINET',
             dataIndex: 'cabinet',
+            editable: true
         },
         {
             title: 'POST',
-            dataIndex: 'post'
+            dataIndex: 'post',
+            editable: true
         },
         {
             title: 'OPERATION',
@@ -128,39 +140,14 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
     ];
     const [dataSource, setDataSource] = useState<User[]>(data);
     const [count, setCount] = useState<number>(data.length);
-
-    const handleDelete = (id: number) => {
-        setDataSource(prevState => prevState.filter(item => item.id !== id));
-    };
-
-    const handleAdd = () => {
-        const newData = {
-            id: dataSource.length,
-            firstName: `Name ${dataSource.length}`,
-            secondName: `Surname ${dataSource.length}`,
-            phone: "88005553535",
-            cabinet: "229",
-            internalPhone: "00-00"
-        };
-        setDataSource(prevState => [...prevState, newData] as User[]);
-        setCount(prevState => prevState + 1);
-    };
-
-    const handleSave = (row: any) => {
-        const newData = [...dataSource];
-        const index = newData.findIndex(item => row.key === item.id);
-        const item = newData[index];
-        newData.splice(index, 1, {...item, ...row});
-        setDataSource(newData);
-    };
-
+    const [isVisibleWarningModal, setIsVisibleWarningModal] = useState<boolean>(false);
+    const [isVisibleAddingUserModal, setIsVisibleAddingUserModal] = useState<boolean>(false);
     const components = {
         body: {
             row: EditableRow,
             cell: EditableCell,
         },
     };
-
     const columns = dataColumns.map(col => {
         if (!col.editable) {
             return col;
@@ -178,9 +165,68 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
         };
     });
 
+    const handleDelete = (id: number) => {
+        DeleteUserMutation(id, () => {
+            setDataSource(prevState => prevState.filter(item => item.id !== id));
+        });
+    };
+
+    const handleAdd = () => {
+        const newData: any = {
+            firstName: `Name ${dataSource.length}`,
+            secondName: `Surname ${dataSource.length}`,
+            phone: 88005553535,
+            cabinet: 229,
+            internalPhone: 336
+        };
+        AddUserMutation(newData, (userId: number) => {
+            newData.id = userId;
+            setDataSource(prevState => [...prevState, newData] as User[]);
+            setCount(prevState => prevState + 1);
+        });
+    };
+
+    const handleSave = (row: User) => {
+        if (isValidChanges(row)) {
+            UpdateUserMutation(row, (user: User) => {
+                const newData = [...dataSource];
+                const index = newData.findIndex(item => user.id === item.id);
+                const item = newData[index];
+                newData.splice(index, 1, {...item, ...user});
+                setDataSource(newData);
+            });
+        } else {
+            setIsVisibleWarningModal(true);
+        }
+    };
+
+    const isValidChanges = (user: User): boolean => {
+        return !!(
+            Number(user.phone) > 80000000000 &&
+            Number(user.phone) < 89999999999 &&
+            Number(user.cabinet) > 1 &&
+            Number(user.cabinet) < 500 &&
+            user.post &&
+            user.post?.length > 5 &&
+            user.post?.length < 30 &&
+            Number(user.internalPhone) > 100 &&
+            Number(user.internalPhone) < 1000
+        )
+    };
+
     return (
         <div>
             <div>Total contacts: {count}</div>
+            <Modal title="Warning!"
+                   visible={isVisibleWarningModal}
+                   onOk={() => setIsVisibleWarningModal(false)}
+                   onCancel={() => setIsVisibleWarningModal(false)}
+            >
+                <p>Phone value must be between 10 and 100</p>
+                <p>Cabinet value must be between 1 and 500</p>
+                <p>Post value length must be between 5 and 30</p>
+                <p>Internal phone value must be between 100 and 1000</p>
+            </Modal>
             <Table
                 components={components}
                 rowClassName={() => 'editable-row'}
@@ -188,14 +234,21 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
                 dataSource={dataSource}
                 columns={columns}
             />
+            <AddingUserModal
+                isVisible={isVisibleAddingUserModal}
+                onOk={() => {
+                    handleAdd();
+                    setIsVisibleWarningModal(false)
+                }}
+                onCancel={() => setIsVisibleAddingUserModal(false)}/>
             <Button
-                onClick={handleAdd}
+                onClick={() => setIsVisibleAddingUserModal(true)}
                 type="primary"
                 style={{
                     marginBottom: 16,
                 }}
             >
-                Add a row
+                Add a contact
             </Button>
         </div>
     );

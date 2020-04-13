@@ -59,9 +59,8 @@ export class UserResolver {
         internalPhone
     }: UpdateUserInput): UserType | undefined {
         let updatedUser: UserType;
-
         this.items = this.items.map(user => {
-            if (user.id === id) {
+            if (user.id === Number(id)) {
                 updatedUser = user;
                 if (firstName) {
                     updatedUser.firstName = firstName;

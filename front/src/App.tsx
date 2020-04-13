@@ -1,5 +1,5 @@
 import React from "react";
-import EditableTableData from "./hoc/EditableTableData";
+import EditableTableData from "./queries/EditableTableData";
 import {PageHeader, Layout} from "antd";
 
 const {Header, Content, Footer} = Layout;

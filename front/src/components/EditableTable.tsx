@@ -134,7 +134,7 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
             render: (text: string, record: any) =>
                 dataSource.length >= 1 ? (
                     <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
-                        <a>Delete</a>
+                        <a href="/#">Delete</a>
                     </Popconfirm>
                 ) : null,
         },

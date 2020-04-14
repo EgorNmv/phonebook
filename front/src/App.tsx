@@ -4,10 +4,6 @@ import {PageHeader, Layout} from "antd";
 
 const {Header, Content, Footer} = Layout;
 
-// import UserListPage from "./components/UserListPage";
-// import {EditableTable} from "./components/EditableTable";
-// import TestComponent from "./components/TestComponent";
-
 function App() {
     return <Layout className="layout">
         <Header style={{background: "white"}}>
@@ -18,9 +14,7 @@ function App() {
             />
         </Header>
         <Content style={{padding: '0 50px'}}>
-            {/*<UserListPage/>*/}
             <EditableTableData/>
-            {/*<TestComponent/>*/}
         </Content>
         <Footer style={{textAlign: 'center'}}>Phone book ©2020</Footer>
     </Layout>;

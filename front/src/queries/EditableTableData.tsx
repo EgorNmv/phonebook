@@ -25,7 +25,6 @@ const EditableTableData: React.FC = () => (
             if (error) {
                 return <div>Error: {error?.message}</div>
             } else if (props) {
-                console.info(props);
                 return <EditableTable data={props.users}/>
             }
             return <div>Loading</div>

@@ -5,7 +5,6 @@ import * as path from "path";
 import cors from "cors";
 import graphqlHTTP from "express-graphql";
 import {buildSchemaSync} from "type-graphql";
-import {RecipeResolver} from "./gql/resolvers/recipeResolver";
 import {UserResolver} from "./gql/resolvers/userResolver";
 import {GraphQLSchema} from "graphql";
 
@@ -14,7 +13,7 @@ dotenv.config();
 const PORT: number = Number(process.env.SERVER_PORT) || 8080;
 const app: express.Application = express();
 const schema: GraphQLSchema = buildSchemaSync({
-    resolvers: [RecipeResolver, UserResolver],
+    resolvers: [ UserResolver],
     emitSchemaFile: path.resolve(__dirname, "../src/gql", "schema.gql"),
 });
 

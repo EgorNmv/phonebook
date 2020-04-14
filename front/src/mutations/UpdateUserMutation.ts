@@ -32,12 +32,6 @@ const mutation = graphql`
 `;
 
 export default (user: User, callback: Function) => {
-    console.info(typeof user.id);
-    console.info(typeof user.firstName);
-    console.info(typeof user.secondName);
-    console.info(typeof user.phone, user.phone);
-    console.info(typeof user.cabinet, user.cabinet);
-    console.info(typeof user.post);
     const variables = {
         id: Number(user.id),
         firstName: user.firstName,

@@ -5,6 +5,7 @@ import AddUserMutation from "../mutations/AddUserMutation";
 import DeleteUserMutation from "../mutations/DeleteUserMutation";
 import UpdateUserMutation from "../mutations/UpdateUserMutation";
 import {AddingUserModal} from "./AddingUserModal";
+import {WARNINGS} from "../utils/constants";
 
 const EditableContext = React.createContext(null as any);
 
@@ -171,17 +172,11 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
         });
     };
 
-    const handleAdd = () => {
-        const newData: any = {
-            firstName: `Name ${dataSource.length}`,
-            secondName: `Surname ${dataSource.length}`,
-            phone: 88005553535,
-            cabinet: 229,
-            internalPhone: 336
-        };
-        AddUserMutation(newData, (userId: number) => {
-            newData.id = userId;
-            setDataSource(prevState => [...prevState, newData] as User[]);
+    const handleAdd = (user: Partial<User>) => {
+        setIsVisibleAddingUserModal(false);
+        AddUserMutation(user, (userId: number) => {
+            user.id = userId;
+            setDataSource(prevState => [...prevState, user] as User[]);
             setCount(prevState => prevState + 1);
         });
     };
@@ -216,16 +211,16 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
 
     return (
         <div>
-            <div>Total contacts: {count}</div>
+            <div style={{textAlign: "center", margin: 10}}><span>Total contacts: {count}</span></div>
             <Modal title="Warning!"
                    visible={isVisibleWarningModal}
                    onOk={() => setIsVisibleWarningModal(false)}
                    onCancel={() => setIsVisibleWarningModal(false)}
             >
-                <p>Phone value must be between 10 and 100</p>
-                <p>Cabinet value must be between 1 and 500</p>
-                <p>Post value length must be between 5 and 30</p>
-                <p>Internal phone value must be between 100 and 1000</p>
+                <p>{WARNINGS.phone}</p>
+                <p>{WARNINGS.cabinet}</p>
+                <p>{WARNINGS.post}</p>
+                <p>{WARNINGS.internalPhone}</p>
             </Modal>
             <Table
                 components={components}
@@ -236,10 +231,7 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
             />
             <AddingUserModal
                 isVisible={isVisibleAddingUserModal}
-                onOk={() => {
-                    handleAdd();
-                    setIsVisibleWarningModal(false)
-                }}
+                onOk={handleAdd}
                 onCancel={() => setIsVisibleAddingUserModal(false)}/>
             <Button
                 onClick={() => setIsVisibleAddingUserModal(true)}

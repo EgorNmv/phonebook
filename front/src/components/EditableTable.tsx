@@ -1,15 +1,15 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import {Table, Input, Button, Popconfirm, Form, Modal} from 'antd';
-import {Column, User} from "../utils/types";
+import {ColumnType, EditableCellProps, EditableRowProps, EditableTableProps, User} from "../utils/types";
 import AddUserMutation from "../mutations/AddUserMutation";
 import DeleteUserMutation from "../mutations/DeleteUserMutation";
 import UpdateUserMutation from "../mutations/UpdateUserMutation";
 import {AddingUserModal} from "./AddingUserModal";
 import {WARNINGS} from "../utils/constants";
 
-const EditableContext = React.createContext(null as any);
+const EditableContext = React.createContext<any>(null);
 
-const EditableRow = ({index, ...props}: any) => {
+const EditableRow: React.FC<EditableRowProps> = ({index, ...props}) => {
     const [form] = Form.useForm();
     return (
         <Form form={form} component={false}>
@@ -20,7 +20,7 @@ const EditableRow = ({index, ...props}: any) => {
     );
 };
 
-const EditableCell = (
+const EditableCell: React.FC<EditableCellProps> = (
     {
         title,
         editable,
@@ -29,18 +29,12 @@ const EditableCell = (
         record,
         handleSave,
         ...restProps
-    }: any
+    }
 ) => {
     const [editing, setEditing] = useState<boolean>(false);
     const inputRef = useRef<Input>(null);
     const form = useContext(EditableContext);
-    useEffect(() => {
-        if (editing) {
-            if (inputRef && inputRef.current) {
-                inputRef.current.focus();
-            }
-        }
-    }, [editing]);
+    let childNode = children;
 
     const toggleEdit = () => {
         setEditing(!editing);
@@ -52,6 +46,7 @@ const EditableCell = (
     const save = async () => {
         try {
             const values = await form.validateFields();
+
             toggleEdit();
             handleSave({...record, ...values});
         } catch (errInfo) {
@@ -59,14 +54,18 @@ const EditableCell = (
         }
     };
 
-    let childNode = children;
+    useEffect(() => {
+        if (editing) {
+            if (inputRef && inputRef.current) {
+                inputRef.current.focus();
+            }
+        }
+    }, [editing]);
 
     if (editable) {
         childNode = editing ? (
             <Form.Item
-                style={{
-                    margin: 0,
-                }}
+                className="editable-cell-form-item"
                 name={dataIndex}
                 rules={[
                     {
@@ -80,9 +79,6 @@ const EditableCell = (
         ) : (
             <div
                 className="editable-cell-value-wrap"
-                style={{
-                    paddingRight: 24,
-                }}
                 onClick={toggleEdit}
             >
                 {children}
@@ -93,9 +89,9 @@ const EditableCell = (
     return <td {...restProps}>{childNode}</td>;
 };
 
-export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
+export const EditableTable: React.FC<EditableTableProps> = ({data}) => {
 
-    const dataColumns: Column[] = [
+    const dataColumns: ColumnType[] = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -131,7 +127,7 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
         {
             title: 'OPERATION',
             dataIndex: 'operation',
-            render: (text: string, record: any) =>
+            render: (text: string, record: User) =>
                 dataSource.length >= 1 ? (
                     <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
                         <a href="/#">Delete</a>
@@ -182,7 +178,9 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
     };
 
     const handleSave = (row: User) => {
-        if (isValidChanges(row)) {
+        const {isValid, isIdentical} = isValidChanges(row);
+
+        if (isValid && !isIdentical) {
             UpdateUserMutation(row, (user: User) => {
                 const newData = [...dataSource];
                 const index = newData.findIndex(item => user.id === item.id);
@@ -190,32 +188,48 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
                 newData.splice(index, 1, {...item, ...user});
                 setDataSource(newData);
             });
-        } else {
+        } else if (!isValid && !isIdentical) {
             setIsVisibleWarningModal(true);
         }
     };
 
-    const isValidChanges = (user: User): boolean => {
-        return !!(
-            Number(user.phone) > 80000000000 &&
-            Number(user.phone) < 89999999999 &&
-            Number(user.cabinet) > 1 &&
-            Number(user.cabinet) < 500 &&
-            user.post &&
-            user.post?.length > 5 &&
-            user.post?.length < 30 &&
-            Number(user.internalPhone) > 100 &&
-            Number(user.internalPhone) < 1000
-        )
+    const isValidChanges = (user: User): { isIdentical: boolean, isValid: boolean } => {
+        const detectedUser: User | undefined = data.find(userInList => userInList.id === user.id);
+        let isIdentical = false;
+
+        if (detectedUser) {
+            try {
+                isIdentical = JSON.stringify(user) === JSON.stringify(detectedUser);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        return {
+            isIdentical,
+            isValid: !!(
+                Number(user.phone) > 80000000000 &&
+                Number(user.phone) < 89999999999 &&
+                Number(user.cabinet) > 1 &&
+                Number(user.cabinet) < 500 &&
+                user.post &&
+                user.post?.length > 5 &&
+                user.post?.length < 30 &&
+                Number(user.internalPhone) > 100 &&
+                Number(user.internalPhone) < 1000
+            )
+        }
     };
 
     return (
         <div>
-            <div style={{textAlign: "center", margin: 10}}><span>Total contacts: {count}</span></div>
+            <div className="table-total-contact-block">
+                <span>Total contacts: {count}</span>
+            </div>
             <Modal title="Warning!"
                    visible={isVisibleWarningModal}
                    onOk={() => setIsVisibleWarningModal(false)}
                    onCancel={() => setIsVisibleWarningModal(false)}
+
             >
                 <p>{WARNINGS.phone}</p>
                 <p>{WARNINGS.cabinet}</p>
@@ -226,6 +240,7 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
                 components={components}
                 rowClassName={() => 'editable-row'}
                 bordered
+                rowKey={"id"}
                 dataSource={dataSource}
                 columns={columns}
             />
@@ -236,9 +251,7 @@ export const EditableTable: React.FC<{ data: User[] }> = ({data}) => {
             <Button
                 onClick={() => setIsVisibleAddingUserModal(true)}
                 type="primary"
-                style={{
-                    marginBottom: 16,
-                }}
+                className="add-contact-button"
             >
                 Add a contact
             </Button>

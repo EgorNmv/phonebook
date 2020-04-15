@@ -1,4 +1,13 @@
-export const WARNINGS: any = {
+type Warnings = {
+    firstName: string,
+    secondName: string,
+    phone: string,
+    cabinet: string,
+    post: string,
+    internalPhone: string
+}
+
+export const WARNINGS: Warnings = {
     firstName: "First name is required",
     secondName: "Second name is required",
     phone: "Phone value must be between 80000000000 and 89999999999",

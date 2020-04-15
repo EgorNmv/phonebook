@@ -1,20 +1,7 @@
 import React, {useState} from "react";
 import {Modal, Input, Card} from 'antd';
-import {User} from "../utils/types";
+import {AddingUserModalProps, ConfigValidData, User} from "../utils/types";
 import {WARNINGS} from "../utils/constants";
-
-type AddingUserModalProps = {
-    isVisible: boolean,
-    onOk: (user: Omit<User, "id">) => void,
-    onCancel: () => void
-}
-
-type ConfigValidData = {
-    propName: "firstName" | "secondName" | "phone" | "cabinet" | "post" | "internalPhone",
-    required: boolean,
-    maxValue?: number,
-    minValue?: number,
-};
 
 export const AddingUserModal: React.FC<AddingUserModalProps> = ({isVisible, onOk, onCancel}) => {
     const [firstName, setFirstName] = useState<string>("");
@@ -23,7 +10,7 @@ export const AddingUserModal: React.FC<AddingUserModalProps> = ({isVisible, onOk
     const [cabinet, setCabinet] = useState<string>("");
     const [post, setPost] = useState<string>("");
     const [internalPhone, setInternalPhone] = useState<string>("");
-    const [warnings, setWarning] = useState<any[]>([]); //Partial<Omit<User, "id">>
+    const [warnings, setWarning] = useState<Partial<keyof Omit<User, "id">>[]>([]);
 
     const checkOnValidData = (value: string, config: ConfigValidData) => {
         let touchedValue = false;
@@ -41,7 +28,7 @@ export const AddingUserModal: React.FC<AddingUserModalProps> = ({isVisible, onOk
         }
 
         if (warnings && !touchedValue) {
-            setWarning(warnings.filter((item: any) => (
+            setWarning(warnings.filter(item => (
                 item !== config.propName
             )));
         }
@@ -67,7 +54,7 @@ export const AddingUserModal: React.FC<AddingUserModalProps> = ({isVisible, onOk
                     size="small"
                     headStyle={{background: "#1890ff"}}
                 >
-                    {warnings.map((item: any) =>
+                    {warnings.map((item) =>
                         (<p>{WARNINGS[item]}</p>))
                     }
                 </Card>)}

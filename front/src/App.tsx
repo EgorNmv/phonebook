@@ -6,17 +6,17 @@ const {Header, Content, Footer} = Layout;
 
 function App() {
     return <Layout className="layout">
-        <Header style={{background: "white"}}>
+        <Header>
             <PageHeader
                 className="site-page-header"
                 title="PHONEBOOK"
                 subTitle="Manage your contacts easy"
             />
         </Header>
-        <Content style={{padding: '0 50px'}}>
+        <Content>
             <EditableTableData/>
         </Content>
-        <Footer style={{textAlign: 'center'}}>Phone book ©2020</Footer>
+        <Footer>Phone book ©2020</Footer>
     </Layout>;
 }
 

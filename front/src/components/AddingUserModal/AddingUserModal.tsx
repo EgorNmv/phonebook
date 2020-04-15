@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Modal, Input, Card} from 'antd';
-import {AddingUserModalProps, ConfigValidData, User} from "../utils/types";
-import {WARNINGS} from "../utils/constants";
+import {AddingUserModalProps, ConfigValidData, User} from "../../utils/types";
+import {WARNINGS} from "../../utils/constants";
 
 export const AddingUserModal: React.FC<AddingUserModalProps> = ({isVisible, onOk, onCancel}) => {
     const [firstName, setFirstName] = useState<string>("");

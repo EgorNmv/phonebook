@@ -1,5 +1,5 @@
 import React from "react";
-import EditableTableData from "./queries/EditableTableData";
+import EditableTableWithData from "./queries/EditableTableWithData";
 import {PageHeader, Layout} from "antd";
 
 const {Header, Content, Footer} = Layout;
@@ -14,7 +14,7 @@ function App() {
             />
         </Header>
         <Content>
-            <EditableTableData/>
+            <EditableTableWithData/>
         </Content>
         <Footer>Phone book ©2020</Footer>
     </Layout>;

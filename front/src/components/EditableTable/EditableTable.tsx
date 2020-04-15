@@ -1,93 +1,13 @@
-import React, {useContext, useState, useEffect, useRef} from 'react';
-import {Table, Input, Button, Popconfirm, Form, Modal} from 'antd';
-import {ColumnType, EditableCellProps, EditableRowProps, EditableTableProps, User} from "../utils/types";
-import AddUserMutation from "../mutations/AddUserMutation";
-import DeleteUserMutation from "../mutations/DeleteUserMutation";
-import UpdateUserMutation from "../mutations/UpdateUserMutation";
-import {AddingUserModal} from "./AddingUserModal";
-import {WARNINGS} from "../utils/constants";
-
-const EditableContext = React.createContext<any>(null);
-
-const EditableRow: React.FC<EditableRowProps> = ({index, ...props}) => {
-    const [form] = Form.useForm();
-    return (
-        <Form form={form} component={false}>
-            <EditableContext.Provider value={form}>
-                <tr {...props} />
-            </EditableContext.Provider>
-        </Form>
-    );
-};
-
-const EditableCell: React.FC<EditableCellProps> = (
-    {
-        title,
-        editable,
-        children,
-        dataIndex,
-        record,
-        handleSave,
-        ...restProps
-    }
-) => {
-    const [editing, setEditing] = useState<boolean>(false);
-    const inputRef = useRef<Input>(null);
-    const form = useContext(EditableContext);
-    let childNode = children;
-
-    const toggleEdit = () => {
-        setEditing(!editing);
-        form.setFieldsValue({
-            [dataIndex]: record[dataIndex],
-        });
-    };
-
-    const save = async () => {
-        try {
-            const values = await form.validateFields();
-
-            toggleEdit();
-            handleSave({...record, ...values});
-        } catch (errInfo) {
-            console.log('Save failed:', errInfo);
-        }
-    };
-
-    useEffect(() => {
-        if (editing) {
-            if (inputRef && inputRef.current) {
-                inputRef.current.focus();
-            }
-        }
-    }, [editing]);
-
-    if (editable) {
-        childNode = editing ? (
-            <Form.Item
-                className="editable-cell-form-item"
-                name={dataIndex}
-                rules={[
-                    {
-                        required: true,
-                        message: `${title} is required.`,
-                    },
-                ]}
-            >
-                <Input ref={inputRef} onPressEnter={save} onBlur={save}/>
-            </Form.Item>
-        ) : (
-            <div
-                className="editable-cell-value-wrap"
-                onClick={toggleEdit}
-            >
-                {children}
-            </div>
-        );
-    }
-
-    return <td {...restProps}>{childNode}</td>;
-};
+import React, {useState} from 'react';
+import {Table, Button, Popconfirm, Modal} from 'antd';
+import {ColumnType, EditableTableProps, User} from "../../utils/types";
+import AddUserMutation from "../../mutations/AddUserMutation";
+import DeleteUserMutation from "../../mutations/DeleteUserMutation";
+import UpdateUserMutation from "../../mutations/UpdateUserMutation";
+import {AddingUserModal} from "../AddingUserModal/AddingUserModal";
+import {WARNINGS} from "../../utils/constants";
+import {EditableRow} from "./EditableRow";
+import {EditableCell} from "./EditableCell";
 
 export const EditableTable: React.FC<EditableTableProps> = ({data}) => {
 
@@ -152,7 +72,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({data}) => {
 
         return {
             ...col,
-            onCell: (record: any) => ({
+            onCell: (record: User) => ({
                 record,
                 editable: col.editable,
                 dataIndex: col.dataIndex,

@@ -1,7 +1,7 @@
 import React from "react";
 import {QueryRenderer, graphql} from "react-relay";
 import environment from "../Enviroment";
-import {EditableTable} from "../components/EditableTable";
+import {EditableTable} from "../components/EditableTable/EditableTable";
 
 const EditableTableDataQuery = graphql`
     query EditableTableDataQuery {
@@ -17,7 +17,7 @@ const EditableTableDataQuery = graphql`
     }
 `;
 
-const EditableTableData: React.FC = () => (
+const EditableTableWithData: React.FC = () => (
     <QueryRenderer
         environment={environment}
         query={EditableTableDataQuery}
@@ -33,4 +33,4 @@ const EditableTableData: React.FC = () => (
     />
 );
 
-export default EditableTableData;
+export default EditableTableWithData;
